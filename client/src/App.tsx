@@ -11,11 +11,12 @@ import { Progress } from "@/components/ui/progress";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Wallet, Zap, AlertCircle, Terminal, Cpu, Play, Pause, Square, Banknote, History, DollarSign, Monitor, AlertTriangle, Link, Clock, ChevronLeft, ChevronRight } from "lucide-react";
+import { Wallet, Zap, AlertCircle, Terminal, Cpu, Play, Pause, Square, Banknote, History, DollarSign, Monitor, AlertTriangle, Link, Clock, ChevronLeft, ChevronRight, User } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { formatUnits } from "viem";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import type { ClaimHistory } from "@shared/schema";
+import { formatDistanceToNow } from "date-fns";
 
 const USDC_ADDRESS = "0x3600000000000000000000000000000000000000";
 const MAX_CLAIM_LIMIT = BigInt(2000 * 1000000); // 2000 USDC with 6 decimals
@@ -806,18 +807,24 @@ export default function App() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-2 max-h-48 overflow-y-auto dark-scrollbar">
+                  <div className="space-y-3 max-h-64 overflow-y-auto dark-scrollbar">
                     {claimHistoryData && claimHistoryData.length > 0 ? (
                       <>
                         {claimHistoryData
                           .slice((historyPage - 1) * CLAIMS_PER_PAGE, historyPage * CLAIMS_PER_PAGE)
                           .map((claim) => (
-                            <div key={claim.id} className="flex justify-between items-center text-xs border-b border-border/20 pb-2" data-testid={`claim-history-${claim.id}`}>
-                              <div className="flex flex-col gap-1">
-                                <span className="font-mono text-muted-foreground">{claim.walletAddress.slice(0, 6)}...{claim.walletAddress.slice(-4)}</span>
-                                <span className="text-muted-foreground">{new Date(claim.claimedAt).toLocaleDateString()}</span>
+                            <div key={claim.id} className="bg-background/50 rounded-md p-3 border border-border/30" data-testid={`claim-history-${claim.id}`}>
+                              <div className="flex justify-between items-start">
+                                <div className="flex flex-col gap-1">
+                                  <span className="font-bold text-green-500 text-sm">+{parseFloat(claim.amount).toFixed(2)} USDC</span>
+                                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                    <User className="w-3 h-3" />
+                                    <span className="font-mono">{claim.walletAddress.slice(0, 7)}...{claim.walletAddress.slice(-4)}</span>
+                                    <span>·</span>
+                                    <span>{formatDistanceToNow(new Date(claim.claimedAt), { addSuffix: true })}</span>
+                                  </div>
+                                </div>
                               </div>
-                              <span className="font-bold text-green-500">+{parseFloat(claim.amount).toFixed(2)} USDC</span>
                             </div>
                           ))}
                         {claimHistoryData.length > CLAIMS_PER_PAGE && (
@@ -825,7 +832,6 @@ export default function App() {
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="h-6 w-6"
                               onClick={() => setHistoryPage(prev => Math.max(1, prev - 1))}
                               disabled={historyPage === 1}
                               data-testid="button-history-prev"
@@ -837,7 +843,6 @@ export default function App() {
                                 key={page}
                                 variant={historyPage === page ? "default" : "ghost"}
                                 size="sm"
-                                className="h-6 w-6 p-0 text-xs"
                                 onClick={() => setHistoryPage(page)}
                                 data-testid={`button-history-page-${page}`}
                               >
@@ -847,7 +852,6 @@ export default function App() {
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="h-6 w-6"
                               onClick={() => setHistoryPage(prev => Math.min(Math.ceil(claimHistoryData.length / CLAIMS_PER_PAGE), prev + 1))}
                               disabled={historyPage >= Math.ceil(claimHistoryData.length / CLAIMS_PER_PAGE)}
                               data-testid="button-history-next"
