@@ -30,14 +30,16 @@ Preferred communication style: Simple, everyday language.
 
 ### Blockchain Integration
 - **Network**: Arc Testnet (Chain ID: 5042002, RPC: https://rpc.testnet.arc.network)
-- **Smart Contract**: Pre-deployed faucet at `0xd9145CCE52D386f254917e481eB44e9943F39138`
-- **Token**: USDC contract at `0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d`
+- **Faucet Contract**: `0xBd736A5D744A6364dd74B12Bb679d66360d7AeD9`
+- **USDC Token**: `0x3600000000000000000000000000000000000000`
 - **Wallet Connection**: MetaMask via injected connector
+- **Block Explorer**: https://testnet.arcscan.app
 
 ### Key Design Decisions
 1. **Simulated Mining**: Mining is purely visual/frontend - actual tokens come from faucet contract claims
-2. **Separation of Concerns**: Blockchain interactions handled client-side, claim history stored server-side
-3. **Pre-deployed Contract**: The smart contract should NOT be redeployed - only frontend integration
+2. **Linear Reward Progress**: USDC reward increases linearly from 0 to 200 over exactly 10 minutes
+3. **Real-time Claim History**: Fetched from Arcscan API every 30 seconds, filtering 200 USDC transfers
+4. **Pre-deployed Contract**: The smart contract should NOT be redeployed - only frontend integration
 
 ## External Dependencies
 
