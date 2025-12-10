@@ -17,7 +17,7 @@ import { formatUnits } from "viem";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import type { ClaimHistory } from "@shared/schema";
 
-const USDC_ADDRESS = "0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d";
+const USDC_ADDRESS = "0x3600000000000000000000000000000000000000";
 
 const formatUSDC = (value: bigint | undefined) => {
   if (!value) return "0.00";
