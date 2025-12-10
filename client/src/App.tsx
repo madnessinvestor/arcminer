@@ -159,10 +159,10 @@ export default function App() {
     },
   });
 
-  const { data: claimHistoryData } = useQuery<ClaimHistory[]>({
+  const { data: claimHistoryData, isLoading: isLoadingHistory } = useQuery<ClaimHistory[]>({
     queryKey: ['/api/claim-history'],
-    enabled: !!address,
     refetchInterval: 30000,
+    staleTime: 0,
   });
 
   const createClaimMutation = useMutation({
@@ -499,14 +499,86 @@ export default function App() {
         </header>
 
         {!isConnected && (
-          <div className="h-[60vh] flex flex-col items-center justify-center text-center space-y-6">
-            <div className="w-24 h-24 rounded-2xl bg-primary/20 flex items-center justify-center border border-primary/50 shadow-[0_0_30px_rgba(124,58,237,0.3)]">
-              <Cpu className="w-12 h-12 text-primary" />
+          <div className="space-y-8">
+            <div className="h-[40vh] flex flex-col items-center justify-center text-center space-y-6">
+              <div className="w-24 h-24 rounded-2xl bg-primary/20 flex items-center justify-center border border-primary/50 shadow-[0_0_30px_rgba(124,58,237,0.3)]">
+                <Cpu className="w-12 h-12 text-primary" />
+              </div>
+              <div className="space-y-2 max-w-md">
+                <h2 className="text-3xl font-bold tracking-tighter">Welcome to ArcMiner</h2>
+                <p className="text-muted-foreground">Connect your wallet to start simulating mining operations on the Arc Testnet and earn USDC rewards.</p>
+              </div>
             </div>
-            <div className="space-y-2 max-w-md">
-              <h2 className="text-3xl font-bold tracking-tighter">Welcome to ArcMiner</h2>
-              <p className="text-muted-foreground">Connect your wallet to start simulating mining operations on the Arc Testnet and earn USDC rewards.</p>
-            </div>
+
+            <Card className="bg-card/50 backdrop-blur-sm border-primary/20 max-w-2xl mx-auto">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium flex items-center gap-2">
+                  <History className="w-4 h-4" /> Claim History
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3 max-h-64 overflow-y-auto dark-scrollbar">
+                  {isLoadingHistory ? (
+                    <p className="text-xs text-muted-foreground text-center py-4">Loading claims...</p>
+                  ) : claimHistoryData && claimHistoryData.length > 0 ? (
+                    <>
+                      {claimHistoryData
+                        .slice((historyPage - 1) * CLAIMS_PER_PAGE, historyPage * CLAIMS_PER_PAGE)
+                        .map((claim) => (
+                          <div key={claim.id} className="bg-background/50 rounded-md p-3 border border-border/30" data-testid={`claim-history-welcome-${claim.id}`}>
+                            <div className="flex justify-between items-start">
+                              <div className="flex flex-col gap-1">
+                                <span className="font-bold text-green-500 text-sm">+{parseFloat(claim.amount).toFixed(2)} USDC</span>
+                                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                  <User className="w-3 h-3" />
+                                  <span className="font-mono">{claim.walletAddress.slice(0, 7)}...{claim.walletAddress.slice(-4)}</span>
+                                  <span>·</span>
+                                  <span>{formatDistanceToNow(new Date(claim.claimedAt), { addSuffix: true })}</span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      {claimHistoryData.length > CLAIMS_PER_PAGE && (
+                        <div className="flex items-center justify-center gap-1 pt-2">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => setHistoryPage(prev => Math.max(1, prev - 1))}
+                            disabled={historyPage === 1}
+                            data-testid="button-history-prev-welcome"
+                          >
+                            <ChevronLeft className="w-4 h-4" />
+                          </Button>
+                          {Array.from({ length: Math.ceil(claimHistoryData.length / CLAIMS_PER_PAGE) }, (_, i) => i + 1).map(page => (
+                            <Button
+                              key={page}
+                              variant={historyPage === page ? "default" : "ghost"}
+                              size="sm"
+                              onClick={() => setHistoryPage(page)}
+                              data-testid={`button-history-page-welcome-${page}`}
+                            >
+                              {page}
+                            </Button>
+                          ))}
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => setHistoryPage(prev => Math.min(Math.ceil(claimHistoryData.length / CLAIMS_PER_PAGE), prev + 1))}
+                            disabled={historyPage >= Math.ceil(claimHistoryData.length / CLAIMS_PER_PAGE)}
+                            data-testid="button-history-next-welcome"
+                          >
+                            <ChevronRight className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    <p className="text-xs text-muted-foreground text-center py-4">No claims yet</p>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
           </div>
         )}
 
@@ -808,7 +880,9 @@ export default function App() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3 max-h-64 overflow-y-auto dark-scrollbar">
-                    {claimHistoryData && claimHistoryData.length > 0 ? (
+                    {isLoadingHistory ? (
+                      <p className="text-xs text-muted-foreground text-center py-4">Loading claims...</p>
+                    ) : claimHistoryData && claimHistoryData.length > 0 ? (
                       <>
                         {claimHistoryData
                           .slice((historyPage - 1) * CLAIMS_PER_PAGE, historyPage * CLAIMS_PER_PAGE)
