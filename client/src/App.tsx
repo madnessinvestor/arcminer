@@ -280,7 +280,19 @@ export default function App() {
           </div>
         </header>
 
-        {isConnected ? (
+        {!isConnected && (
+          <div className="h-[60vh] flex flex-col items-center justify-center text-center space-y-6">
+            <div className="w-24 h-24 rounded-2xl bg-primary/20 flex items-center justify-center border border-primary/50 shadow-[0_0_30px_rgba(124,58,237,0.3)]">
+              <Cpu className="w-12 h-12 text-primary" />
+            </div>
+            <div className="space-y-2 max-w-md">
+              <h2 className="text-3xl font-bold tracking-tighter">Welcome to ArcMiner</h2>
+              <p className="text-muted-foreground">Connect your wallet to start simulating mining operations on the Arc Testnet and earn USDC rewards.</p>
+            </div>
+          </div>
+        )}
+
+        {isConnected && (
           <>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <Card className="bg-card/50 backdrop-blur-sm border-primary/20">
@@ -491,19 +503,6 @@ export default function App() {
               </Card>
             </div>
           </>
-        ) : (
-          <div className="h-[60vh] flex flex-col items-center justify-center text-center space-y-6">
-            <div className="w-24 h-24 rounded-2xl bg-primary/20 flex items-center justify-center border border-primary/50 shadow-[0_0_30px_rgba(124,58,237,0.3)]">
-              <Cpu className="w-12 h-12 text-primary" />
-            </div>
-            <div className="space-y-2 max-w-md">
-              <h2 className="text-3xl font-bold tracking-tighter">Welcome to ArcMiner</h2>
-              <p className="text-muted-foreground">Connect your wallet to start simulating mining operations on the Arc Testnet and earn USDC rewards.</p>
-            </div>
-            <Button size="lg" onClick={() => connect({ connector: injected() })} className="bg-primary text-primary-foreground hover:bg-primary/90 text-lg px-8" data-testid="button-connect-wallet">
-              Connect Wallet
-            </Button>
-          </div>
         )}
 
         <footer className="border-t border-border/40 pt-6 pb-4">
