@@ -465,7 +465,7 @@ export default function App() {
             </div>
             <div>
               <h1 className="text-2xl font-bold tracking-tighter" data-testid="text-app-title">ArcMiner</h1>
-              <p className="text-xs text-muted-foreground uppercase tracking-widest">Testnet Simulation Node</p>
+              <p className="text-xs text-muted-foreground uppercase tracking-widest">Testnet Simulation POW</p>
             </div>
           </div>
           
